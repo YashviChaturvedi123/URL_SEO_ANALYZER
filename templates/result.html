@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-logo">&#9881; SEO Analyzer</a>
+        <a href="/" class="nav-back">&#8592; New Analysis</a>
+    </div>
+</nav>
+
+{% if data.warning %}
+<div class="warning-banner">&#9888; {{ data.warning }}</div>
+{% endif %}
+
+<div class="results-wrap">
+
+    <div class="results-header">
+        <h1>Analysis Results</h1>
+        <p class="analyzed-url">&#128279; <a href="{{ data.url }}" target="_blank" rel="noopener">{{ data.url }}</a></p>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="dash-card score-card">
+            <div class="score-circle-wrap">
+                <svg viewBox="0 0 120 120" class="score-ring-svg">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="#1e2030" stroke-width="10"/>
+                    <circle cx="60" cy="60" r="50" fill="none"
+                        stroke="{% if seo.grade_color == 'green' %}#64ffda{% elif seo.grade_color == 'yellow' %}#ffd166{% elif seo.grade_color == 'orange' %}#f4a261{% else %}#ef476f{% endif %}"
+                        stroke-width="10"
+                        stroke-dasharray="314"
+                        stroke-dashoffset="{{ 314 - (314 * seo.score / 100) }}"
+                        stroke-linecap="round"
+                        transform="rotate(-90 60 60)"
+                        class="score-arc"
+                    />
+                </svg>
+                <div class="score-num">{{ seo.score }}<span class="score-denom">/100</span></div>
+            </div>
+            <p class="grade-label grade-{{ seo.grade_color }}">{{ seo.grade }}</p>
+            <p class="dash-sub">SEO Score</p>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-num">{{ data.links.total }}</div>
+            <div class="dash-label">Total Internal Links</div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-num">{{ data.links.unique }}</div>
+            <div class="dash-label">Unique URLs Found</div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-num">{{ data.links.details|length }}</div>
+            <div class="dash-label">URLs Tested</div>
+        </div>
+
+        <div class="dash-card {% if data.links.broken_count > 0 %}dash-warn{% endif %}">
+            <div class="dash-num">{{ data.links.broken_count }}</div>
+            <div class="dash-label">Broken URLs Found</div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-num">{{ data.images.total }}</div>
+            <div class="dash-label">Images Found</div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-num">{{ data.response_time }}s</div>
+            <div class="dash-label">Page Response Time</div>
+        </div>
+
+        <div class="dash-card {% if data.images.missing_alt > 0 %}dash-warn{% endif %}">
+            <div class="dash-num">{{ data.images.missing_alt }}</div>
+            <div class="dash-label">Missing Alt Tags</div>
+        </div>
+
+        <div class="dash-card dash-status-card {% if data.title.status == 'Good' %}dash-ok{% elif data.title.status == 'Missing' %}dash-bad{% else %}dash-partial{% endif %}">
+            <div class="status-icon">
+                {% if data.title.status == 'Good' %}&#10003;{% elif data.title.status == 'Missing' %}&#10007;{% else %}&#9888;{% endif %}
+            </div>
+            <div class="dash-label">Title Tag</div>
+            <div class="status-badge">{{ data.title.status }}</div>
+        </div>
+
+        <div class="dash-card dash-status-card {% if data.meta_description.status == 'Good' %}dash-ok{% elif data.meta_description.status == 'Missing' %}dash-bad{% else %}dash-partial{% endif %}">
+            <div class="status-icon">
+                {% if data.meta_description.status == 'Good' %}&#10003;{% elif data.meta_description.status == 'Missing' %}&#10007;{% else %}&#9888;{% endif %}
+            </div>
+            <div class="dash-label">Meta Description</div>
+            <div class="status-badge">{{ data.meta_description.status }}</div>
+        </div>
+
+    </div>
+
+    <div class="section-group">
+        <h2 class="sec-heading">SEO Score Breakdown</h2>
+        <div class="info-card">
+            <h3>Score Formula</h3>
+            <ul>
+                <li>Title Tag - 20 Points</li>
+                <li>Meta Description - 20 Points</li>
+                <li>H1 Structure - 15 Points</li>
+                <li>Image Alt Text - 15 Points</li>
+                <li>Broken Links - 15 Points</li>
+                <li>URL Quality - 15 Points</li>
+            </ul>
+            <p><strong>Total Possible Score: 100</strong></p>
+        </div>
+        <div class="breakdown-list">
+            {% for item in seo.breakdown %}
+            <div class="breakdown-row">
+                <span class="br-check">{{ item.check }}</span>
+                <div class="br-bar-wrap">
+                    <div class="br-bar" style="width: {{ (item.points / item.max * 100)|int }}%"></div>
+                </div>
+                <span class="br-pts">{{ item.points }}/{{ item.max }}</span>
+                <span class="br-status br-{{ item.status.lower() }}">{{ item.status }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="two-col">
+
+        <div class="info-card">
+            <h2>&#128196; Title Analysis</h2>
+            {% if data.title.text %}
+                <p class="meta-text">"{{ data.title.text }}"</p>
+                <div class="meta-row"><span>Length</span><span class="tag-{{ data.title.status.lower().replace(' ', '-') }}">{{ data.title.length }} chars</span></div>
+                <div class="meta-row"><span>Status</span><span class="tag-{{ data.title.status.lower().replace(' ', '-') }}">{{ data.title.status }}</span></div>
+                <p class="hint-text">Ideal title: 10–60 characters</p>
+            {% else %}
+                <p class="missing-text">&#10007; No title tag found on this page.</p>
+            {% endif %}
+        </div>
+
+        <div class="info-card">
+            <h2>&#128221; Meta Description</h2>
+            {% if data.meta_description.text %}
+                <p class="meta-text">"{{ data.meta_description.text[:120] }}{% if data.meta_description.length > 120 %}...{% endif %}"</p>
+                <div class="meta-row"><span>Length</span><span class="tag-{{ data.meta_description.status.lower().replace(' ', '-') }}">{{ data.meta_description.length }} chars</span></div>
+                <div class="meta-row"><span>Status</span><span class="tag-{{ data.meta_description.status.lower().replace(' ', '-') }}">{{ data.meta_description.status }}</span></div>
+                <p class="hint-text">Ideal description: 50–160 characters</p>
+            {% else %}
+                <p class="missing-text">&#10007; No meta description found on this page.</p>
+            {% endif %}
+        </div>
+
+        <div class="info-card">
+            <h2>&#129695; Heading Structure</h2>
+            <div class="heading-bars">
+                <div class="h-row">
+                    <span class="h-tag">H1</span>
+                    <div class="h-bar-bg"><div class="h-bar" style="width: {{ [data.headings.h1 * 20, 100]|min }}%"></div></div>
+                    <span class="h-count">{{ data.headings.h1 }}</span>
+                </div>
+                <div class="h-row">
+                    <span class="h-tag">H2</span>
+                    <div class="h-bar-bg"><div class="h-bar h2" style="width: {{ [data.headings.h2 * 10, 100]|min }}%"></div></div>
+                    <span class="h-count">{{ data.headings.h2 }}</span>
+                </div>
+                <div class="h-row">
+                    <span class="h-tag">H3</span>
+                    <div class="h-bar-bg"><div class="h-bar h3" style="width: {{ [data.headings.h3 * 5, 100]|min }}%"></div></div>
+                    <span class="h-count">{{ data.headings.h3 }}</span>
+                </div>
+            </div>
+            {% if data.headings.h1 != 1 %}
+            <p class="hint-text warn">&#9888; Recommended: exactly 1 H1 tag per page.</p>
+            {% endif %}
+        </div>
+
+        <div class="info-card">
+            <h2>&#128248; Image Analysis</h2>
+            <div class="meta-row"><span>Total Images</span><span>{{ data.images.total }}</span></div>
+            <div class="meta-row"><span>With Alt Text</span><span class="tag-good">{{ data.images.total - data.images.missing_alt }}</span></div>
+            <div class="meta-row"><span>Missing Alt Text</span>
+                <span class="{% if data.images.missing_alt > 0 %}tag-fail{% else %}tag-good{% endif %}">{{ data.images.missing_alt }}</span>
+            </div>
+            {% if data.images.total > 0 %}
+            <div class="img-bar-wrap">
+                <div class="img-bar-ok" style="width: {{ ((data.images.total - data.images.missing_alt) / data.images.total * 100)|int }}%"></div>
+            </div>
+            <p class="hint-text">{{ ((data.images.total - data.images.missing_alt) / data.images.total * 100)|int }}% of images have alt text</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="section-group">
+        <h2 class="sec-heading">&#128279; Internal Link Analysis</h2>
+        {% if data.links.details %}
+        <p class="hint-text">
+            {{ data.links.total }} total links discovered •
+            {{ data.links.unique }} unique URLs identified •
+            {{ data.links.details|length }} URLs tested for status verification
+        </p>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>URL</th>
+                        <th>Status Code</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in data.links.details %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="link-cell"><a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.url[:70] }}{% if link.url|length > 70 %}...{% endif %}</a></td>
+                        <td><span class="code-pill code-{{ 'ok' if link.status_code < 400 and link.status_code > 0 else 'err' }}">{{ link.status_code if link.status_code > 0 else 'ERR' }}</span></td>
+                        <td><span class="status-pill {% if link.status_code == 999 %}pill-warning{% elif link.is_broken %}pill-broken{% else %}pill-ok{% endif %}">{% if link.status_code == 999 %}Blocked by Website{% elif link.is_broken %}Broken{% else %}Working{% endif %}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="hint-text"> 
+            Status verification was performed on {{ data.links.details|length }}
+            sampled URLs to improve analysis speed.
+        </p>
+        {% else %}
+        <p class="empty-msg">No internal links found on this page.</p>
+        {% endif %}
+    </div>
+
+    {% if data.url_quality %}
+    <div class="section-group">
+        <h2 class="sec-heading warn-heading">&#9888; URL Quality Issues ({{ data.url_quality|length }} found)</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr><th>#</th><th>URL</th><th>Issue</th></tr>
+                </thead>
+                <tbody>
+                    {% for issue in data.url_quality %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="link-cell">{{ issue.url[:70] }}{% if issue.url|length > 70 %}...{% endif %}</td>
+                        <td><span class="issue-tag">{{ issue.issue }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="section-group">
+        <h2 class="sec-heading">&#10003; URL Quality</h2>
+        <p class="success-msg">No URL quality issues detected.</p>
+    </div>
+    {% endif %}
+
+    <div class="section-group">
+        <h2 class="sec-heading">&#128190; Full Report</h2>
+        <div class="table-wrap">
+            {{ report_table|safe }}
+        </div>
+        <div class="download-row">
+            <a href="/download" class="download-btn">&#11015; Download CSV Report</a>
+            <a href="/" class="secondary-btn">&#43; Analyze Another URL</a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Quality & SEO Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-inner">
+        <span class="nav-logo">&#9881; SEO Analyzer</span>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">&#128269; Free SEO Tool</div>
+        <h1>URL Quality &amp;<br><span class="accent">SEO Analyzer</span></h1>
+        <p class="hero-sub">Enter any URL and get a full breakdown of SEO health, broken links, metadata quality, and a downloadable report — all in seconds.</p>
+
+        {% if error %}
+        <div class="error-box">
+            <span>&#9888;</span> {{ error }}
+        </div>
+        {% endif %}
+
+        <form class="url-form" action="/analyze" method="POST">
+            <div class="input-row">
+                <input
+                    type="text"
+                    name="url"
+                    placeholder="https://example.com"
+                    class="url-input"
+                    required
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <button type="submit" class="analyze-btn">
+                    <span class="btn-icon">&#9650;</span> Analyze
+                </button>
+            </div>
+            <p class="input-hint">Try: https://wikipedia.org &nbsp;|&nbsp; https://github.com</p>
+        </form>
+    </div>
+    <div class="hero-visual">
+        <div class="score-demo">
+            <div class="score-ring">
+                <svg viewBox="0 0 120 120" class="ring-svg">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="#1e2030" stroke-width="10"/>
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="#64ffda" stroke-width="10"
+                        stroke-dasharray="251" stroke-dashoffset="63" stroke-linecap="round"
+                        transform="rotate(-90 60 60)"/>
+                </svg>
+                <div class="score-text">75<span class="score-max">/100</span></div>
+            </div>
+            <p class="score-label">Sample SEO Score</p>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <h2 class="section-title">What Gets Analyzed</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feat-icon">&#128196;</div>
+            <h3>Title &amp; Meta</h3>
+            <p>Checks your page title and meta description for optimal length and presence.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feat-icon">&#128279;</div>
+            <h3>Link Analysis</h3>
+            <p>Finds all internal links and tests each one for broken or dead URLs.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feat-icon">&#128248;</div>
+            <h3>Image SEO</h3>
+            <p>Counts images and flags those missing important alt text attributes.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feat-icon">&#128200;</div>
+            <h3>SEO Score</h3>
+            <p>Generates a score out of 100 based on multiple on-page SEO factors.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feat-icon">&#129695;</div>
+            <h3>Heading Structure</h3>
+            <p>Counts H1, H2, H3 tags to evaluate content hierarchy and structure.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feat-icon">&#128190;</div>
+            <h3>CSV Report</h3>
+            <p>Download the full analysis as a CSV file for your records or presentations.</p>
+        </div>
+    </div>
+</section>
+</body>
+</html>
