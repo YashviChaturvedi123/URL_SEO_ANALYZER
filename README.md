@@ -169,5 +169,3 @@ Developed a web-based URL Quality & SEO Analyzer using Python, Flask, BeautifulS
 Yashvi Chaturvedi
 
 B.Tech Computer Science Engineering (Minor: Data Science)
-
-Portfolio Project – 2026
