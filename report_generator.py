@@ -1,3 +1,5 @@
+import tempfile
+
 import pandas as pd
 import os
 import time
@@ -37,9 +39,9 @@ def generate_report(data, seo):
 
     df = pd.DataFrame(rows)
 
-    os.makedirs('reports', exist_ok=True)
     filename = f"seo_report_{int(time.time())}.csv"
-    filepath = os.path.join('reports', filename)
+    filepath = os.path.join(tempfile.gettempdir(), filename)
+
     df.to_csv(filepath, index=False)
 
     return filepath, filename, df
